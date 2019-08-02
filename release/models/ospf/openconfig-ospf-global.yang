@@ -1,7 +1,7 @@
-submodule openconfig-ospfv2-global {
+submodule openconfig-ospf-global {
 
-  belongs-to openconfig-ospfv2 {
-    prefix "oc-ospfv2";
+  belongs-to openconfig-ospf {
+    prefix "oc-ospf";
   }
 
   import ietf-yang-types { prefix "yang"; }
@@ -10,7 +10,8 @@ submodule openconfig-ospfv2-global {
   import openconfig-ospf-types { prefix "oc-ospft"; }
 
   // Include common submodule
-  include openconfig-ospfv2-common;
+  include openconfig-ospf-common;
+  include openconfig-ospfv2-lsdb;
 
   // meta
   organization "OpenConfig working group";
@@ -23,7 +24,13 @@ submodule openconfig-ospfv2-global {
     "This submodule provides OSPFv2 configuration and operational
     state parameters that are global to a particular OSPF instance";
 
-  oc-ext:openconfig-version "0.2.0";
+  oc-ext:openconfig-version "0.2.1";
+
+  revision "2019-07-31" {
+    description
+      "Add asbr capability and abr capability";
+    reference "0.2.1";
+  }
 
   revision "2019-07-09" {
     description
@@ -61,9 +68,9 @@ submodule openconfig-ospfv2-global {
     reference "0.0.1";
   }
 
-  grouping ospfv2-global-config {
+  grouping ospf-global-config {
     description
-      "Global configuration for OSPFv2";
+      "Global configuration for OSPF";
 
     leaf router-id {
       type yang:dotted-quad;
@@ -121,9 +128,32 @@ submodule openconfig-ospfv2-global {
       reference
         "RFC6860 - Hiding Transit-Only Networks in OSPF";
     }
+
+    leaf asbr-capability {
+      type boolean;
+      default true;
+      description
+        "When this leaf is set to false, the router does not act
+         as asbr and no external LSAs will be flooded into
+         the AS";
+    }
+
+    leaf abr-capability {
+      type identityref {
+        base "oc-ospf-types:OSPF-ABR-TYPE";
+      }
+      default RFC3509-COMPATIBLE;
+      description
+        "When the leaf is set to RFC2328-COMPATIBLE, the router
+         acts as an ABR when it participates in multiple OSPF
+         areas. It does not matter whether the backbone area
+         exists or not. When the leaf is set to RFC3509-COMPATIBLE,
+         the router acts as an ABR when the router participates
+         in multiple OSPF areas, one of which must be backbone.";
+    }
   }
 
-  grouping ospfv2-global-spf-timers-config {
+  grouping ospf-global-spf-timers-config {
     description
       "Configuration parameters relating to global SPF timer
       parameters for OSPFv2";
@@ -157,7 +187,7 @@ submodule openconfig-ospfv2-global {
     // ALU has first-wait, second-wait, max-wait
   }
 
-  grouping ospfv2-global-lsa-generation-timers-config {
+  grouping ospf-global-lsa-generation-timers-config {
     description
       "Configuration parameters relating to global LSA generation
       parameters for OSPFv2";
@@ -182,23 +212,23 @@ submodule openconfig-ospfv2-global {
     }
   }
 
-  grouping ospfv2-global-spf-timers-state {
+  grouping ospf-global-spf-timers-state {
     description
       "Operational state parameters relating to OSPFv2 global
       timers";
 
-    uses ospfv2-common-timers;
+    uses ospf-common-timers;
   }
 
-  grouping ospfv2-global-lsa-generation-timers-state {
+  grouping ospf-global-lsa-generation-timers-state {
     description
       "Operational state parameters relating to OSPFv2 global
       timers";
 
-    uses ospfv2-common-timers;
+    uses ospf-common-timers;
   }
 
-  grouping ospfv2-global-graceful-restart-config {
+  grouping ospf-global-graceful-restart-config {
     description
       "Configuration parameters relating to graceful restart for
       OSPFv2";
@@ -223,7 +253,7 @@ submodule openconfig-ospfv2-global {
     }
   }
 
-  grouping ospfv2-global-mpls-config {
+  grouping ospf-global-mpls-config {
     description
       "Configuration parameters for OSPFv2 options which
       relate to MPLS";
@@ -237,7 +267,7 @@ submodule openconfig-ospfv2-global {
     }
   }
 
-  grouping ospfv2-global-inter-areapp-config {
+  grouping ospf-global-inter-areapp-config {
     description
       "Configuration parameters for OSPFv2 policies which propagate
       prefixes between areas";
@@ -265,7 +295,7 @@ submodule openconfig-ospfv2-global {
     uses oc-rpol:apply-policy-import-config;
   }
 
-  grouping ospfv2-global-max-metric-config {
+  grouping ospf-global-max-metric-config {
     description
       "Configuration paramters relating to setting the OSPFv2
       maximum metric.";
@@ -318,7 +348,7 @@ submodule openconfig-ospfv2-global {
     }
   }
 
-  grouping ospfv2-global-structural {
+  grouping ospf-global-structural {
     description
       "Top level structural grouping for OSPFv2 global parameters";
 
@@ -330,14 +360,22 @@ submodule openconfig-ospfv2-global {
       container config {
         description
           "Global configuration parameters for OSPFv2";
-        uses ospfv2-global-config;
+        uses ospf-global-config;
       }
 
       container state {
         config false;
         description
           "Operational state parameters for OSPFv2";
-        uses ospfv2-global-config;
+        uses ospf-global-config;
+
+        uses ospfv2-global-lsdb-structure {
+          when "../../../../../protocol = 'OSPF'" {
+            description
+              "OSPFv2 ls database";
+          }
+        }
+
       }
 
       container timers {
@@ -354,7 +392,7 @@ submodule openconfig-ospfv2-global {
             description
               "Configuration parameters relating to global OSPFv2
               SPF timers";
-            uses ospfv2-global-spf-timers-config;
+            uses ospf-global-spf-timers-config;
           }
 
           container state {
@@ -362,8 +400,8 @@ submodule openconfig-ospfv2-global {
             description
               "Operational state parameters relating to the global
               OSPFv2 SPF timers";
-            uses ospfv2-global-spf-timers-config;
-            uses ospfv2-global-spf-timers-state;
+            uses ospf-global-spf-timers-config;
+            uses ospf-global-spf-timers-state;
           }
         }
 
@@ -376,7 +414,7 @@ submodule openconfig-ospfv2-global {
             description
               "Configuration parameters relating to setting the OSPFv2
               maximum metric for a set of advertised entities.";
-            uses ospfv2-global-max-metric-config;
+            uses ospf-global-max-metric-config;
           }
 
           container state {
@@ -384,7 +422,7 @@ submodule openconfig-ospfv2-global {
             description
               "Operational state parameters relating to setting the
               OSPFv2 maximum metric for a set of advertised entities.";
-            uses ospfv2-global-max-metric-config;
+            uses ospf-global-max-metric-config;
           }
         }
 
@@ -398,7 +436,7 @@ submodule openconfig-ospfv2-global {
             description
               "Configuration parameters relating to the generation of
               LSAs by the local system";
-            uses ospfv2-global-lsa-generation-timers-config;
+            uses ospf-global-lsa-generation-timers-config;
           }
 
           container state {
@@ -406,8 +444,8 @@ submodule openconfig-ospfv2-global {
             description
               "Operational state parameters relating to the generation
               of LSAs by the local system";
-            uses ospfv2-global-lsa-generation-timers-config;
-            uses ospfv2-global-lsa-generation-timers-state;
+            uses ospf-global-lsa-generation-timers-config;
+            uses ospf-global-lsa-generation-timers-state;
           }
         }
       }
@@ -421,7 +459,7 @@ submodule openconfig-ospfv2-global {
           description
             "Configuration parameters relating to OSPFv2 graceful
             restart";
-          uses ospfv2-global-graceful-restart-config;
+          uses ospf-global-graceful-restart-config;
         }
 
         container state {
@@ -429,7 +467,7 @@ submodule openconfig-ospfv2-global {
           description
             "Operational state parameters relating to OSPFv2 graceful
             restart";
-          uses ospfv2-global-graceful-restart-config;
+          uses ospf-global-graceful-restart-config;
         }
       }
 
@@ -440,7 +478,7 @@ submodule openconfig-ospfv2-global {
         container config {
           description
             "Configuration parameters relating to MPLS for OSPFv2";
-          uses ospfv2-global-mpls-config;
+          uses ospf-global-mpls-config;
         }
 
         container state {
@@ -448,7 +486,7 @@ submodule openconfig-ospfv2-global {
           description
             "Operational state parameters relating to MPLS for
             OSPFv2";
-          uses ospfv2-global-mpls-config;
+          uses ospf-global-mpls-config;
         }
 
         container igp-ldp-sync {
@@ -459,7 +497,7 @@ submodule openconfig-ospfv2-global {
             description
               "Configuration parameters relating to LDP/IG
               synchronization.";
-            uses ospfv2-common-mpls-igp-ldp-sync-config;
+            uses ospf-common-mpls-igp-ldp-sync-config;
           }
 
           container state {
@@ -467,7 +505,7 @@ submodule openconfig-ospfv2-global {
             description
               "Operational state variables relating to LDP/IGP
               synchronization";
-            uses ospfv2-common-mpls-igp-ldp-sync-config;
+            uses ospf-common-mpls-igp-ldp-sync-config;
           }
         }
       }
@@ -504,7 +542,7 @@ submodule openconfig-ospfv2-global {
             description
               "Configuration parameters relating to the inter-area
               propagation policy";
-            uses ospfv2-global-inter-areapp-config;
+            uses ospf-global-inter-areapp-config;
           }
 
           container state {
@@ -512,7 +550,7 @@ submodule openconfig-ospfv2-global {
             description
               "Operational state parameters relating to the inter-area
               propagation policy";
-            uses ospfv2-global-inter-areapp-config;
+            uses ospf-global-inter-areapp-config;
           }
         }
       }
