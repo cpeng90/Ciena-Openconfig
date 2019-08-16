@@ -12,6 +12,9 @@ submodule openconfig-ospf-area-interface {
 
   // include common submodule
   include openconfig-ospf-common;
+  include openconfig-ospfv2-area-interface;
+  include openconfig-ospfv3-area-interface;
+  include openconfig-ospfv2-lsdb;
 
   // meta
   organization "OpenConfig working group";
@@ -21,7 +24,7 @@ submodule openconfig-ospf-area-interface {
     www.openconfig.net";
 
   description
-    "This submodule provides OSPFv2 configuration and operational
+    "This submodule provides OSPF configuration and operational
     state parameters that are specific to the area context";
 
   oc-ext:openconfig-version "0.2.1";
@@ -84,12 +87,13 @@ submodule openconfig-ospf-area-interface {
         base "oc-ospf-types:OSPF_NETWORK_TYPE";
       }
       description
-        "The type of network that OSPFv2 should use for the specified
+        "The type of network that OSPF should use for the specified
         interface.";
     }
 
     leaf priority {
       type uint8;
+      default 1;
       description
         "The local system's priority to become the designated
         router";
@@ -117,12 +121,14 @@ submodule openconfig-ospf-area-interface {
 
     leaf metric {
       type oc-ospf-types:ospf-metric;
+      default 10;
       description
         "The metric for the interface";
     }
 
     leaf passive {
       type boolean;
+      default false;
       description
         "When this leaf is set to true, the interface should be
         advertised within the OSPF area but OSPF adjacencies should
@@ -133,7 +139,7 @@ submodule openconfig-ospf-area-interface {
       type boolean;
       description
         "When this leaf is set to true, the network connected to
-        the interface should be hidden from OSPFv2 advertisements
+        the interface should be hidden from OSPF advertisements
         per the procedure described in RFC6860.";
       reference
         "RFC6860 - Hiding Transit-Only Networks in OSFF";
@@ -150,12 +156,13 @@ submodule openconfig-ospf-area-interface {
 
   grouping ospf-area-interface-timers-config {
     description
-      "Configuration parameters relating to per-interface OSPFv2
+      "Configuration parameters relating to per-interface OSPF
       timers";
 
     leaf dead-interval {
       type uint32;
       units seconds;
+      default 40;
       description
         "The number of seconds that the local system should let
         elapse before declaring a silent router down";
@@ -165,6 +172,7 @@ submodule openconfig-ospf-area-interface {
     leaf hello-interval {
       type uint32;
       units seconds;
+      default 10;
       description
         "The number of seconds the local system waits between the
         transmission of subsequent Hello packets";
@@ -173,6 +181,7 @@ submodule openconfig-ospf-area-interface {
     leaf retransmission-interval {
       type uint32;
       units seconds;
+      default 5;
       description
         "The number of seconds that the local system waits before
         retransmitting an unacknowledged LSA.";
@@ -188,16 +197,11 @@ submodule openconfig-ospf-area-interface {
     }
   }
 
-  grouping ospf-area-interface-mpls-config {
-    description
-      "Configuration parameters relating to MPLS extensions for OSPF";
-
-    leaf traffic-engineering-metric {
-      type uint32;
+  uses ospfv2-area-interface-mpls-config {
+    when "../../../../../../../../protocol = 'OSPF'"
+    {
       description
-        "A link metric that should only be considered for traffic
-        engineering purposes.";
-      reference "RFC3630, §2.5.5";
+        "Configuration parameters relating to MPLS extensions for OSPFv2";
     }
   }
 
@@ -315,18 +319,14 @@ submodule openconfig-ospf-area-interface {
     // filtering options which exist in some implementations.
   }
 
-  grouping ospf-area-interface-mpls-igp-ldp-sync-state {
-    description
-      "Operational state parameters relating to MPLS LDP/IGP
-      synchronization on a per-neighbor basis";
 
-    leaf synchronized {
-      type boolean;
+  uses ospfv2-area-interface-mpls-igp-ldp-sync-state
+  {
+    when "../../../../../../../../protocol = 'OSPF'"
+    {
       description
-        "When the value of this leaf is set to true, the
-        LDP neighbors reachable via this interface are considered
-        to be synchronized, and hence the link is considered
-        usable by the IGP.";
+        "Operational state parameters relating to MPLS LDP/IGP
+         synchronization on a per-neighbor basis";
     }
   }
 
@@ -357,7 +357,7 @@ submodule openconfig-ospf-area-interface {
         container config {
           description
             "Configuration parameters for the interface on which
-            OSPFv2 is enabled";
+            OSPF is enabled";
 
           uses ospf-area-interface-config;
         }
@@ -366,19 +366,27 @@ submodule openconfig-ospf-area-interface {
           config false;
           description
             "Operational state parameters for the interface on which
-            OSPFv2 is enabled";
+            OSPF is enabled";
           uses ospf-area-interface-config;
+          uses ospfv2-link-lsdb-structure {
+            when "../../../../../../../protocol = 'OSPF'"
+            {
+              description
+                "Configuration and operational state parameters for
+                 OSPFv2 extensions related to MPLS on the interface.";
+            }
+          }
         }
 
         uses oc-if:interface-ref;
 
         container timers {
           description
-            "Timers relating to OSPFv2 on the interface";
+            "Timers relating to OSPF on the interface";
 
           container config {
             description
-              "Configuration parameters for OSPFv2 timers on the
+              "Configuration parameters for OSPF timers on the
               interface";
             uses ospf-area-interface-timers-config;
           }
@@ -386,58 +394,27 @@ submodule openconfig-ospf-area-interface {
           container state {
             config false;
             description
-              "Operational state parameters for OSPFv2 timers on
+              "Operational state parameters for OSPF timers on
               the interface";
 
             uses ospf-area-interface-timers-config;
           }
         }
 
-        container mpls {
-          description
-            "Configuration and operational state parameters for
-            OSPFv2 extensions related to MPLS on the interface.";
 
-          container config {
+        group ospfv2-mpls
+        {
+          when "../../../../../../../../protocol = 'OSPF'"
+          {
             description
-              "Configuration parameters for OSPFv2 extensions relating
-              to MPLS for the interface";
-            uses ospf-area-interface-mpls-config;
-          }
-
-          container state {
-            config false;
-            description
-              "Operational state for OSPFv2 extensions relating to
-              MPLS for the interface";
-            uses ospf-area-interface-mpls-config;
-          }
-
-          container igp-ldp-sync {
-            description
-              "OSPFv2 parameters relating to LDP/IGP synchronization";
-
-            container config {
-              description
-                "Configuration parameters relating to LDP/IG
-                synchronization.";
-              uses ospf-common-mpls-igp-ldp-sync-config;
-            }
-
-            container state {
-              config false;
-              description
-                "Operational state variables relating to LDP/IGP
-                synchronization";
-              uses ospf-common-mpls-igp-ldp-sync-config;
-              uses ospf-area-interface-mpls-igp-ldp-sync-state;
-            }
+              "Configuration and operational state parameters for
+               OSPFv2 extensions related to MPLS on the interface.";
           }
         }
 
         container lsa-filter {
           description
-            "OSPFv2 parameters relating to filtering of LSAs to
+            "OSPF parameters relating to filtering of LSAs to
             neighbors the specified interface.";
 
           container config {
@@ -465,7 +442,7 @@ submodule openconfig-ospf-area-interface {
             key "router-id";
 
             description
-              "A neighbor with which an OSPFv2 adjacency has been
+              "A neighbor with which an OSPF adjacency has been
               established within this area";
 
             leaf router-id {
@@ -497,18 +474,4 @@ submodule openconfig-ospf-area-interface {
       }
     }
   }
-
-  grouping ospfv3-area-interface-config {
-    description
-      "Structural grouping for configuration and operational state
-      parameters that relate to an interface";
-
-    leaf instance-id {
-      type uint8;
-      default 0;
-      description
-        "The OSPF protocol instance associated with this OSPF interface.";
-    }
-  }
-
 }

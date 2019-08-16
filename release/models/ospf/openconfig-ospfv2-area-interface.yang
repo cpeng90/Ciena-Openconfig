@@ -1,0 +1,111 @@
+submodule openconfig-ospfv2-area-interface {
+
+  belongs-to openconfig-ospf {
+    prefix "oc-ospf";
+  }
+
+  import ietf-yang-types { prefix "yang"; }
+  import openconfig-extensions { prefix "oc-ext"; }
+  import openconfig-types { prefix "oc-types"; }
+  import openconfig-interfaces { prefix "oc-if"; }
+  import openconfig-ospf-types { prefix "oc-ospf-types"; }
+
+  // include common submodule
+  include openconfig-ospf-common;
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    www.openconfig.net";
+
+  description
+    "This submodule provides OSPFv2 configuration and operational
+    state parameters that are specific to the area context";
+
+  oc-ext:openconfig-version "0.0.1";
+
+  revision "2019-08-16" {
+    description
+      "Initial revision";
+    reference "0.0.1";
+  }
+
+
+  grouping ospfv2-area-interface-mpls-config {
+    description
+      "Configuration parameters relating to MPLS extensions for OSPFv2";
+
+    leaf traffic-engineering-metric {
+      type uint32;
+      description
+        "A link metric that should only be considered for traffic
+        engineering purposes.";
+      reference "RFC3630, §2.5.5";
+    }
+  }
+
+  grouping ospfv2-area-interface-mpls-igp-ldp-sync-state {
+    description
+      "Operational state parameters relating to MPLS LDP/IGP
+      synchronization on a per-neighbor basis";
+
+    leaf synchronized {
+      type boolean;
+      description
+        "When the value of this leaf is set to true, the
+        LDP neighbors reachable via this interface are considered
+        to be synchronized, and hence the link is considered
+        usable by the IGP.";
+    }
+  }
+
+  grouping ospfv2-mpls {
+    description
+      "Configuration and operational state parameters for
+       OSPFv2 extensions related to MPLS on the interface.";
+
+    container mpls {
+      description
+        "Configuration and operational state parameters for
+         OSPFv2 extensions related to MPLS on the interface.";
+
+      container config {
+        description
+          "Configuration parameters for OSPF extensions relating
+          to MPLS for the interface";
+        uses ospf-area-interface-mpls-config;
+      }
+
+      container state {
+        config false;
+        description
+          "Operational state for OSPF extensions relating to
+          MPLS for the interface";
+        uses ospf-area-interface-mpls-config;
+      }
+
+      container igp-ldp-sync {
+        description
+          "OSPF parameters relating to LDP/IGP synchronization";
+
+        container config {
+          description
+            "Configuration parameters relating to LDP/IG
+            synchronization.";
+          uses ospf-common-mpls-igp-ldp-sync-config;
+        }
+
+        container state {
+          config false;
+          description
+            "Operational state variables relating to LDP/IGP
+            synchronization";
+          uses ospf-common-mpls-igp-ldp-sync-config;
+          uses ospf-area-interface-mpls-igp-ldp-sync-state;
+        }
+      }
+    }
+  }
+}

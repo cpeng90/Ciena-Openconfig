@@ -14,10 +14,13 @@ module openconfig-ospf {
   // Include submodules
   // Global:  All global context groupings;
   include openconfig-ospf-global;
+  include openconfig-ospfv2-global.yang;
   // Area:    Config/opstate for an area
   include openconfig-ospf-area;
   // Area Interface:  Config/opstate for an Interface
   include openconfig-ospf-area-interface;
+  include openconfig-ospfv2-area-interface;
+  include openconfig-ospfv3-area-interface;
   // LSDB: Operational state model covering the LSDB
   include openconfig-ospf-lsdb;
   // Common:  Content included in >1 context
@@ -133,13 +136,13 @@ module openconfig-ospf {
       container areas {
         description
           "Configuration and operational state relating to an
-          OSPFv2 area.";
+          OSPFv3 area.";
 
         list area {
           key "identifier";
 
           description
-            "The OSPFv2 areas within which the local system exists";
+            "The OSPFv3 areas within which the local system exists";
 
           leaf identifier {
             type leafref {

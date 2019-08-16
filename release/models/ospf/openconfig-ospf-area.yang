@@ -27,7 +27,7 @@ submodule openconfig-ospf-area {
 
   revision "2019-07-31" {
     description
-      "Add address-ranges, external-routing-capability, 
+      "Add address-ranges, 
        stub-default-cost, import-summaries under area/config and 
        add global lsdb under area/state";
     reference "0.2.1";
@@ -125,20 +125,6 @@ submodule openconfig-ospf-area {
       default NORMAL;
       description
         "OSPF area type.";
-    }
-
-    leaf external-routing-capability {
-      type boolean;
-      default true;
-      description
-        "Whether AS-external-LSAs will be flooded  into/throughout 
-         the area.If AS-external-LSAs are excluded from the area, the 
-         area is called a stub area or NSSA.  Internal to stub areas, 
-         routing to external destinations will be based solely on a 
-         default inter-area route. The backbone cannot be configured 
-         as a stub or NSSA area.  Also, virtual links cannot be 
-         configured through stub or NSSA areas.";
-
     }
 
     leaf stub-default-cost {
@@ -253,7 +239,7 @@ submodule openconfig-ospf-area {
         "Operational state parameters relating to an OSPFv2 area";
       uses ospf-area-config;
 
-      uses ospfv2-lsdb-structure {
+      uses ospfv2-area-lsdb-structure {
         when "../../../../../protocol = 'OSPF'" {
           description
             "OSPFv2 ls database";

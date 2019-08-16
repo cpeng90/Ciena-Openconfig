@@ -1,0 +1,95 @@
+submodule openconfig-ospfv2-global {
+
+  belongs-to openconfig-ospf {
+    prefix "oc-ospf";
+  }
+
+  import ietf-yang-types { prefix "yang"; }
+  import openconfig-extensions { prefix "oc-ext"; }
+  import openconfig-routing-policy { prefix "oc-rpol"; }
+  import openconfig-ospf-types { prefix "oc-ospft"; }
+
+  // Include common submodule
+  include openconfig-ospf-common;
+  include openconfig-ospfv2-lsdb;
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    www.openconfig.net";
+
+  description
+    "This submodule provides OSPFv2 configuration and operational
+    state parameters that are global to a particular OSPF instance";
+
+  oc-ext:openconfig-version "0.0.1";
+
+  revision "2019-08-16" {
+    description
+      "Initial revision";
+    reference "0.0.1";
+  }
+
+  grouping ospfv2-global-config {
+    description
+      "Global configuration for OSPFv2";
+
+    leaf summary-route-cost-mode {
+      type enumeration {
+        enum RFC1583_COMPATIBLE {
+          description
+            "Specify that summary routes should assume the cost of
+            the lowest-cost more-specific route as per the behaviour
+            specified in RFC1583";
+        }
+        enum RFC2328_COMPATIBLE {
+          description
+            "Specify that summary routes should assume the cost of the
+            highest-cost more-specific route as per the revised
+            behaviour specified in RFC2328";
+        }
+      }
+      default "RFC2328_COMPATIBLE";
+      description
+        "Specify how costs for the summary routes should be specified
+        as per the behaviour in the original OSPF specification
+        RFC1583, or alternatively whether the revised behaviour
+        described in RFC2328 should be utilised";
+    }
+
+    leaf igp-shortcuts {
+      type boolean;
+      description
+        "When this leaf is set to true, OSPFv2 will route traffic to
+        a remote system via any LSP to the system that is marked as
+        shortcut eligible.";
+    }
+  }
+
+  grouping ospfv2-igp-ldp-sync {
+    description
+      "Global configuration for OSPFv2 LGP LDP sync";
+
+    container igp-ldp-sync {
+      description
+        "OSPFv2 parameters relating to LDP/IGP synchronization";
+
+      container config {
+        description
+          "Configuration parameters relating to LDP/IG
+          synchronization.";
+        uses ospf-common-mpls-igp-ldp-sync-config;
+      }
+
+      container state {
+        config false;
+        description
+          "Operational state variables relating to LDP/IGP
+          synchronization";
+        uses ospf-common-mpls-igp-ldp-sync-config;
+      }
+    }
+  }
+}
