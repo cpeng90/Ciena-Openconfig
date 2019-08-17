@@ -1,17 +1,13 @@
-submodule openconfig-ospfv2-global {
+module openconfig-ospfv2-global {
 
-  belongs-to openconfig-ospf {
-    prefix "oc-ospf";
-  }
+  // namespace
+  namespace "http://openconfig.net/yang/ospfv2/global";
 
-  import ietf-yang-types { prefix "yang"; }
+  prefix "oc-ospf";
+
   import openconfig-extensions { prefix "oc-ext"; }
-  import openconfig-routing-policy { prefix "oc-rpol"; }
-  import openconfig-ospf-types { prefix "oc-ospft"; }
+  import openconfig-network-instance { prefix "oc-ni"; }
 
-  // Include common submodule
-  include openconfig-ospf-common;
-  include openconfig-ospfv2-lsdb;
 
   // meta
   organization "OpenConfig working group";
@@ -68,6 +64,30 @@ submodule openconfig-ospfv2-global {
     }
   }
 
+  grouping ospfv2-common-mpls-igp-ldp-sync-config {
+    description
+      "Configuration parameters used for OSPFv2 MPLS/IGP
+      synchronization";
+
+    leaf enabled {
+      type boolean;
+      description
+        "When this leaf is set to true, do not utilise this link for
+        forwarding via the IGP until such time as LDP adjacencies to
+        the neighbor(s) over the link are established.";
+    }
+
+    leaf post-session-up-delay {
+      type uint32;
+      units milliseconds;
+      description
+        "This leaf specifies a delay, expressed in units of milliseconds,
+        between the LDP session to the IGP neighbor being established, and
+        it being considered synchronized by the IGP.";
+    }
+  }
+
+
   grouping ospfv2-igp-ldp-sync {
     description
       "Global configuration for OSPFv2 LGP LDP sync";
@@ -80,7 +100,7 @@ submodule openconfig-ospfv2-global {
         description
           "Configuration parameters relating to LDP/IG
           synchronization.";
-        uses ospf-common-mpls-igp-ldp-sync-config;
+        uses ospfv2-common-mpls-igp-ldp-sync-config;
       }
 
       container state {
@@ -88,8 +108,76 @@ submodule openconfig-ospfv2-global {
         description
           "Operational state variables relating to LDP/IGP
           synchronization";
-        uses ospf-common-mpls-igp-ldp-sync-config;
+        uses ospfv2-common-mpls-igp-ldp-sync-config;
       }
     }
   }
+
+  grouping ospf-global-mpls-config {
+    description
+      "Configuration parameters for OSPF options which
+      relate to MPLS";
+
+    leaf traffic-engineering-extensions {
+      type boolean;
+      description
+        "When this leaf is set to true, use traffic engineering
+        extensions for OSPF to advertise TE parameters via type 10
+        Opaque LSAs";
+    }
+  }
+
+  grouping ospfv2-mpls {
+    description
+      "OSPFv2 parameters relating to MPLS";
+
+    container mpls {
+      description
+        "OSPFv2 parameters relating to MPLS";
+   
+      container config {
+        description
+          "Configuration parameters relating to MPLS for OSPF";
+        uses ospf-global-mpls-config;
+      }
+   
+      container state {
+        config false;
+        description
+          "Operational state parameters relating to MPLS for
+          OSPF";
+        uses ospf-global-mpls-config;
+      }
+   
+      uses ospfv2-igp-ldp-sync;
+    }
+  }
+
+
+  // augment the groupings into ospf model
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:global/oc-ni:config" {
+    description
+      "Global configuration for OSPFv2";
+    uses ospfv2-global-config;
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:global/oc-ni:state" {
+    description
+      "Global state for OSPFv2";
+    uses ospfv2-global-config;
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:global" {
+    description
+      "OSPFv2 parameters relating to MPLS";
+    uses ospfv2-mpls;
+  }
+
+
 }

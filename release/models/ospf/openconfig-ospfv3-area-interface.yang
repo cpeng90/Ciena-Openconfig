@@ -4,11 +4,8 @@ submodule openconfig-ospfv3-area-interface {
     prefix "oc-ospf";
   }
 
-  import ietf-yang-types { prefix "yang"; }
   import openconfig-extensions { prefix "oc-ext"; }
-  import openconfig-types { prefix "oc-types"; }
-  import openconfig-interfaces { prefix "oc-if"; }
-  import openconfig-ospf-types { prefix "oc-ospf-types"; }
+  import openconfig-network-instance { prefix "oc-ni"; }
 
   // include common submodule
   include openconfig-ospf-common;
@@ -53,4 +50,24 @@ submodule openconfig-ospfv3-area-interface {
          interface index can be used.";
     }
   }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospfv3/" +
+          "oc-ni:areas/oc-ni:area/" +
+          "oc-ni:interfaces/oc-ni:interface/oc-ni:config" {
+    description
+      "OSPFv3 interface paramaters";
+    uses ospfv3-area-interface-config;
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospfv3/" +
+          "oc-ni:areas/oc-ni:area/" +
+          "oc-ni:interfaces/oc-ni:interface/oc-ni:state" {
+    description
+      "OSPFv3 interface paramaters";
+    uses ospfv3-area-interface-config;
+  }
+
+
 }

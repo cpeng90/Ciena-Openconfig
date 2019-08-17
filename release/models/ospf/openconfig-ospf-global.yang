@@ -11,8 +11,6 @@ submodule openconfig-ospf-global {
 
   // Include common submodule
   include openconfig-ospf-common;
-  include openconfig-ospfv2-lsdb;
-  include openconfig-ospfv2-global;
 
   // meta
   organization "OpenConfig working group";
@@ -82,14 +80,6 @@ submodule openconfig-ospf-global {
       reference "rfc2828";
     }
 
-    uses ospfv2-global-config {
-      when "../../../../protocol = 'OSPF'"
-      {
-        description
-          "Configuration parameters for an OSPF protocol";
-      }
-    }
-
     leaf log-adjacency-changes {
       type boolean;
       description
@@ -109,9 +99,9 @@ submodule openconfig-ospf-global {
 
     leaf abr-capability {
       type identityref {
-        base "oc-ospf-types:OSPF-ABR-TYPE";
+        base "oc-ospft:OSPF-ABR-TYPE";
       }
-      default RFC3509-COMPATIBLE;
+      default oc-ospft:RFC3509-COMPATIBLE;
       description
         "When the leaf is set to RFC2328-COMPATIBLE, the router
          acts as an ABR when it participates in multiple OSPF
@@ -222,20 +212,6 @@ submodule openconfig-ospf-global {
     }
   }
 
-  grouping ospf-global-mpls-config {
-    description
-      "Configuration parameters for OSPF options which
-      relate to MPLS";
-
-    leaf traffic-engineering-extensions {
-      type boolean;
-      description
-        "When this leaf is set to true, use traffic engineering
-        extensions for OSPF to advertise TE parameters via type 10
-        Opaque LSAs";
-    }
-  }
-
   grouping ospf-global-inter-areapp-config {
     description
       "Configuration parameters for OSPF policies which propagate
@@ -337,14 +313,6 @@ submodule openconfig-ospf-global {
         description
           "Operational state parameters for OSPF";
         uses ospf-global-config;
-
-        uses ospfv2-global-lsdb-structure {
-          when "../../../../../protocol = 'OSPF'" {
-            description
-              "OSPFv2 ls database";
-          }
-        }
-
       }
 
       container timers {
@@ -437,33 +405,6 @@ submodule openconfig-ospf-global {
             "Operational state parameters relating to OSPF graceful
             restart";
           uses ospf-global-graceful-restart-config;
-        }
-      }
-
-      container mpls {
-        description
-          "OSPFv2 parameters relating to MPLS";
-
-        container config {
-          description
-            "Configuration parameters relating to MPLS for OSPF";
-          uses ospf-global-mpls-config;
-        }
-
-        container state {
-          config false;
-          description
-            "Operational state parameters relating to MPLS for
-            OSPF";
-          uses ospf-global-mpls-config;
-        }
-
-        uses ospfv2-igp-ldp-sync {
-          when "../../../../protocol = 'OSPF'"
-          {
-            description
-              "Configuration parameters for an OSPFv2 IGP LDP synchronization";
-          }
         }
       }
 

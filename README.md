@@ -1,11 +1,21 @@
 The following changes have been made to OSPFv2 and OSPFv3 Yang model.
-1. Change the following Yang module from ospfv2 to ospf in order to have a common module supporting both OSPFv2 and OSPFv3.
+
+1. Change the following Yang module from ospfv2 to ospf in order to have a common module supporting both OSPFv2 and OSPFv3. The idea is to create OSPF common file supporting the core functionality of both OSPFv2 and OSPFv3. Then use augment to augment the core model into OSPFv2 and OSPFv3. Both OSPFv2 and OSPFv3 are under protocol with the name ospf and ospfv3. Although the model is splitted to core and ospfv2/v3 spcific, the produced OSPFv2 Yang tree maintains high similarity to the original openconfig OSPF Yang tree except fixing the defects on the original tree.
+
+File has been changed to OSPF core.
 openconfig-ospfv2-area-interface.yang -> openconfig-ospf-area-interface.yang
 openconfig-ospfv2-area.yang           -> openconfig-ospf-area.yang
 openconfig-ospfv2-common.yang         -> openconfig-ospf-common.yang
 openconfig-ospfv2-global.yang         -> openconfig-ospf-global.yang
 openconfig-ospfv2.yang                -> openconfig-ospf.yang
 
+Add OSPFv2 specific files to augment ospf core model to form OSPFv2 model. All MPLS definitions are move to the following OSPFv2 specific files.
+- openconfig-ospfv2-area-interface.yang
+- openconfig-ospfv2-global.yang
+- openconfig-ospfv2-lsdb.yang
+
+Add OSPFv3 specific files to augment ospf core model to form OSPFv3 model.
+- openconfig-ospfv3-area-interface.yang 
 
 2. In openconfig-network-instance.yang file
   a) Change openconfig-ospfv2 to openconfig-ospf
@@ -25,6 +35,7 @@ openconfig-ospfv2.yang                -> openconfig-ospf.yang
 
 6. In openconfig-ospf-common.yang file
   a) Change ospfv2 to ospf
+  b) Move MPLS related definition to openconfig-ospfv2-global.yang
 
 7. In openconfig-ospf-area.yang file
   a) Change ospfv2 to ospf
@@ -53,3 +64,8 @@ openconfig-ospfv2.yang                -> openconfig-ospf.yang
   a) Add instance-id under ospfv3-area-interface-config, which is required by OSPFv3
   b) Add interface-id under ospfv3-area-interface-config, which is a 32-bit numbered uniquely identifying the interface.
   c) Define ospfv3-area-interface-config which contains OSPFv3 specific configuration
+
+
+To-DO list:
+1. The OSPFv2 LSDB: still have definition errors
+2. The OSPFv3 LDDB is not defined yet.

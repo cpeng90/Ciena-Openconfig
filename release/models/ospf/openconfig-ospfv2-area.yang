@@ -1,0 +1,79 @@
+module openconfig-ospfv2-area {
+
+  // namespace
+  namespace "http://openconfig.net/yang/ospfv2/area";
+
+  prefix "oc-ospf";
+
+  import openconfig-extensions { prefix "oc-ext"; }
+  import openconfig-network-instance { prefix "oc-ni"; }
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    www.openconfig.net";
+
+  description
+    "This submodule provides OSPFv2 configuration and operational
+    state parameters that are specific to the area context";
+
+  oc-ext:openconfig-version "0.2.1";
+
+  revision "2019-08-17" {
+    description
+      "Initial revision";
+    reference "0.0.1";
+  }
+
+  grouping ospf-area-mpls-config {
+    description
+      "Configuration parameters relating to OSPFv2 extensions for
+      MPLS";
+
+    leaf traffic-engineering-enabled {
+      type boolean;
+      description
+        "Specifies whether traffic engineering extensions should be
+        advertised within the area";
+    }
+  }
+
+  grouping ospfv2-mpls-area {
+    description
+      "Configuration and operational state parameters for OSPFv2
+      extensions relating to MPLS";
+
+    container mpls {
+      description
+        "Configuration and operational state parameters for OSPFv2
+        extensions relating to MPLS";
+
+      container config {
+        description
+          "Configuration parameters relating to MPLS extensions for
+          OSPFv2";
+        uses ospf-area-mpls-config;
+      }
+
+      container state {
+        config false;
+        description
+          "Operational state parameters relating to MPLS extensions
+          for OSPFv2";
+        uses ospf-area-mpls-config;
+      }
+    }
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:areas/oc-ni:area" {
+    description
+      "MPLS configuration on OSPFv2 area";
+    uses ospfv2-mpls-area;
+  }
+
+
+}

@@ -10,7 +10,6 @@ submodule openconfig-ospf-area {
 
   // include other required submodules
   include openconfig-ospf-area-interface;
-  include openconfig-ospfv2-lsdb;
 
   // meta
   organization "OpenConfig working group";
@@ -120,9 +119,9 @@ submodule openconfig-ospf-area {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:AREA-TYPE";
+        base "oc-ospf-types:OSPF-AREA-TYPE";
       }
-      default NORMAL;
+      default oc-ospf-types:NORMAL;
       description
         "OSPF area type.";
     }
@@ -195,19 +194,6 @@ submodule openconfig-ospf-area {
     }
   }
 
-  grouping ospf-area-mpls-config {
-    description
-      "Configuration parameters relating to OSPFv2 extensions for
-      MPLS";
-
-    leaf traffic-engineering-enabled {
-      type boolean;
-      description
-        "Specifies whether traffic engineering extensions should be
-        advertised within the area";
-    }
-  }
-
   grouping ospf-area-virtual-link-config {
     description
       "Configuration parameters relating to a virtual-link within
@@ -238,35 +224,6 @@ submodule openconfig-ospf-area {
       description
         "Operational state parameters relating to an OSPFv2 area";
       uses ospf-area-config;
-
-      uses ospfv2-area-lsdb-structure {
-        when "../../../../../protocol = 'OSPF'" {
-          description
-            "OSPFv2 ls database";
-        }
-      }
-
-    }
-
-    container mpls {
-      description
-        "Configuration and operational state parameters for OSPFv2
-        extensions relating to MPLS";
-
-      container config {
-        description
-          "Configuration parameters relating to MPLS extensions for
-          OSPFv2";
-        uses ospf-area-mpls-config;
-      }
-
-      container state {
-        config false;
-        description
-          "Operational state parameters relating to MPLS extensions
-          for OSPFv2";
-        uses ospf-area-mpls-config;
-      }
     }
 
     uses ospf-area-interfaces-structure;

@@ -12,9 +12,6 @@ submodule openconfig-ospf-area-interface {
 
   // include common submodule
   include openconfig-ospf-common;
-  include openconfig-ospfv2-area-interface;
-  include openconfig-ospfv3-area-interface;
-  include openconfig-ospfv2-lsdb;
 
   // meta
   organization "OpenConfig working group";
@@ -145,13 +142,6 @@ submodule openconfig-ospf-area-interface {
         "RFC6860 - Hiding Transit-Only Networks in OSFF";
     }
 
-    uses ospfv3-area-interface-config {
-      when "../../../../../../../../protocol = 'OSPFv3'"
-      {
-        description
-          "Configuration parameters for an OSPFv3 interface";
-      }
-    }
   }
 
   grouping ospf-area-interface-timers-config {
@@ -194,14 +184,6 @@ submodule openconfig-ospf-area-interface {
       description
         "The estimated number of seconds it takes to transmit a Link State
          Update packet over this interface.";
-    }
-  }
-
-  uses ospfv2-area-interface-mpls-config {
-    when "../../../../../../../../protocol = 'OSPF'"
-    {
-      description
-        "Configuration parameters relating to MPLS extensions for OSPFv2";
     }
   }
 
@@ -319,17 +301,6 @@ submodule openconfig-ospf-area-interface {
     // filtering options which exist in some implementations.
   }
 
-
-  uses ospfv2-area-interface-mpls-igp-ldp-sync-state
-  {
-    when "../../../../../../../../protocol = 'OSPF'"
-    {
-      description
-        "Operational state parameters relating to MPLS LDP/IGP
-         synchronization on a per-neighbor basis";
-    }
-  }
-
   grouping ospf-area-interfaces-structure {
     description
       "Structural grouping for configuration and operational state
@@ -368,14 +339,6 @@ submodule openconfig-ospf-area-interface {
             "Operational state parameters for the interface on which
             OSPF is enabled";
           uses ospf-area-interface-config;
-          uses ospfv2-link-lsdb-structure {
-            when "../../../../../../../protocol = 'OSPF'"
-            {
-              description
-                "Configuration and operational state parameters for
-                 OSPFv2 extensions related to MPLS on the interface.";
-            }
-          }
         }
 
         uses oc-if:interface-ref;
@@ -398,17 +361,6 @@ submodule openconfig-ospf-area-interface {
               the interface";
 
             uses ospf-area-interface-timers-config;
-          }
-        }
-
-
-        group ospfv2-mpls
-        {
-          when "../../../../../../../../protocol = 'OSPF'"
-          {
-            description
-              "Configuration and operational state parameters for
-               OSPFv2 extensions related to MPLS on the interface.";
           }
         }
 

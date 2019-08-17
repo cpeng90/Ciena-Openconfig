@@ -4,11 +4,9 @@ submodule openconfig-ospfv2-area-interface {
     prefix "oc-ospf";
   }
 
-  import ietf-yang-types { prefix "yang"; }
   import openconfig-extensions { prefix "oc-ext"; }
-  import openconfig-types { prefix "oc-types"; }
-  import openconfig-interfaces { prefix "oc-if"; }
-  import openconfig-ospf-types { prefix "oc-ospf-types"; }
+  import openconfig-network-instance { prefix "oc-ni"; }
+  import openconfig-ospfv2-global { prefix "oc-ospfv2-g";}
 
   // include common submodule
   include openconfig-ospf-common;
@@ -61,7 +59,7 @@ submodule openconfig-ospfv2-area-interface {
     }
   }
 
-  grouping ospfv2-mpls {
+  grouping ospfv2-mpls-interface {
     description
       "Configuration and operational state parameters for
        OSPFv2 extensions related to MPLS on the interface.";
@@ -75,7 +73,7 @@ submodule openconfig-ospfv2-area-interface {
         description
           "Configuration parameters for OSPF extensions relating
           to MPLS for the interface";
-        uses ospf-area-interface-mpls-config;
+        uses ospfv2-area-interface-mpls-config;
       }
 
       container state {
@@ -83,7 +81,7 @@ submodule openconfig-ospfv2-area-interface {
         description
           "Operational state for OSPF extensions relating to
           MPLS for the interface";
-        uses ospf-area-interface-mpls-config;
+        uses ospfv2-area-interface-mpls-config;
       }
 
       container igp-ldp-sync {
@@ -94,7 +92,7 @@ submodule openconfig-ospfv2-area-interface {
           description
             "Configuration parameters relating to LDP/IG
             synchronization.";
-          uses ospf-common-mpls-igp-ldp-sync-config;
+          uses oc-ospfv2-g:ospfv2-common-mpls-igp-ldp-sync-config;
         }
 
         container state {
@@ -102,10 +100,20 @@ submodule openconfig-ospfv2-area-interface {
           description
             "Operational state variables relating to LDP/IGP
             synchronization";
-          uses ospf-common-mpls-igp-ldp-sync-config;
-          uses ospf-area-interface-mpls-igp-ldp-sync-state;
+          uses oc-ospfv2-g:ospfv2-common-mpls-igp-ldp-sync-config;
+          uses ospfv2-area-interface-mpls-igp-ldp-sync-state;
         }
       }
     }
   }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:areas/oc-ni:area/" +
+          "oc-ni:interfaces/oc-ni:interface" {
+    description
+      "MPLS on OSPFv2 interface";
+    uses ospfv2-mpls-interface;
+  }
+
 }

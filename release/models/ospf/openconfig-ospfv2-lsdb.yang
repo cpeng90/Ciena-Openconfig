@@ -1,15 +1,18 @@
-submodule openconfig-ospfv2-lsdb {
+module openconfig-ospfv2-lsdb {
 
-  belongs-to openconfig-ospf {
-    prefix "oc-ospf";
-  }
+  // namespace
+  namespace "http://openconfig.net/yang/ospfv2/lsdb";
+
+  prefix "oc-niv2-lsdb";
 
   // import some basic types
   import ietf-yang-types { prefix "yang"; }
   import ietf-inet-types { prefix "inet"; }
   import openconfig-types { prefix "oc-types"; }
   import openconfig-extensions { prefix "oc-ext"; }
-  import openconfig-ospf-types { prefix "oc-ospf-types"; }
+  import openconfig-ospf-types { prefix "oc-ni-types"; }
+
+  import openconfig-network-instance { prefix "oc-ni"; }
 
   // meta
   organization "OpenConfig working group";
@@ -194,7 +197,7 @@ submodule openconfig-ospfv2-lsdb {
     }
 
     leaf metric {
-      type oc-ospf-types:ospf-metric;
+      type oc-ni-types:ospf-metric;
       description
         "The metric value to be used for the TOS specified. This value
         represents the cost of use of the link for the specific type
@@ -207,7 +210,7 @@ submodule openconfig-ospfv2-lsdb {
       "Re-usable specification of a segment routing SID";
 
     leaf sid-type {
-      type oc-ospf-types:sr-sid-type;
+      type oc-ni-types:sr-sid-type;
       description
         "The type of the value contained within the sub-TLV";
     }
@@ -225,7 +228,7 @@ submodule openconfig-ospfv2-lsdb {
       "Per-area operational state parameters for an OSPFv2 area";
 
     leaf identifier {
-      type oc-ospf-types:ospf-area-identifier;
+      type oc-ni-types:ospf-area-identifier;
       description
         "An identifier for the area, expressed as a dotted quad or
         an unsigned 32-bit integer";
@@ -238,7 +241,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPF_LSA_TYPE";
+        base "oc-ni-types:OSPF_LSA_TYPE";
       }
       description
         "The type of LSA being described. The type of the LSA is
@@ -1111,7 +1114,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:ROUTER_LSA_TYPES";
+        base "oc-ni-types:ROUTER_LSA_TYPES";
       }
       description
         "The sub-type of the Router LSA.";
@@ -1120,7 +1123,7 @@ submodule openconfig-ospfv2-lsdb {
     uses ospfv2-lsdb-common-link-specification;
 
     leaf metric {
-      type oc-ospf-types:ospf-metric;
+      type oc-ni-types:ospf-metric;
       description
         "The cost of utilising the link specified independent of TOS";
     }
@@ -1231,7 +1234,7 @@ submodule openconfig-ospfv2-lsdb {
     }
 
     leaf metric {
-      type oc-ospf-types:ospf-metric;
+      type oc-ni-types:ospf-metric;
       description
         "The cost to reach the external network specified. The exact
         interpretation of this cost is dependent on the type of
@@ -1300,7 +1303,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPF_OPAQUE_LSA_TYPE";
+        base "oc-ni-types:OSPF_OPAQUE_LSA_TYPE";
       }
       description
         "The Opaque Type of the LSA. This value is used to
@@ -1314,7 +1317,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPF_TE_LSA_TLV_TYPE";
+        base "oc-ni-types:OSPF_TE_LSA_TLV_TYPE";
       }
       description
         "The type of TLV within the Traffic Engineering LSA";
@@ -1335,7 +1338,7 @@ submodule openconfig-ospfv2-lsdb {
     leaf type {
       type union {
         type identityref {
-          base "oc-ospf-types:OSPF_TE_LINK_TLV_TYPE";
+          base "oc-ni-types:OSPF_TE_LINK_TLV_TYPE";
         }
         type enumeration {
           enum UNKNOWN {
@@ -1544,7 +1547,7 @@ submodule openconfig-ospfv2-lsdb {
     leaf type {
       type union {
         type identityref {
-          base "oc-ospf-types:TE_NODE_ATTRIBUTE_TLV_TYPE";
+          base "oc-ni-types:TE_NODE_ATTRIBUTE_TLV_TYPE";
         }
         type enumeration {
           enum UNKNOWN {
@@ -1606,7 +1609,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:GRACE_LSA_TLV_TYPES";
+        base "oc-ni-types:GRACE_LSA_TLV_TYPES";
       }
       description
         "The type of the sub-TLV received within the Grace LSA";
@@ -1687,7 +1690,7 @@ submodule openconfig-ospfv2-lsdb {
     leaf type {
       type union {
         type identityref {
-          base "oc-ospf-types:RI_LSA_TLV_TYPES";
+          base "oc-ni-types:RI_LSA_TLV_TYPES";
         }
         type enumeration {
           enum UNKNOWN {
@@ -1785,7 +1788,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf-list supported-algorithms {
       type identityref {
-        base "oc-ospf-types:SR_ALGORITHM";
+        base "oc-ni-types:SR_ALGORITHM";
       }
       description
         "A list of the algorithms that are supported for segment routing
@@ -1801,7 +1804,7 @@ submodule openconfig-ospfv2-lsdb {
     leaf type {
       type union {
         type identityref {
-          base "oc-ospf-types:OSPF_RI_SR_SID_LABEL_TLV_TYPES";
+          base "oc-ni-types:OSPF_RI_SR_SID_LABEL_TLV_TYPES";
         }
         type enumeration {
           enum UNKNOWN {
@@ -1832,7 +1835,7 @@ submodule openconfig-ospfv2-lsdb {
       range TLV of the RI LSA";
 
     leaf entry-type {
-      type oc-ospf-types:sr-sid-type;
+      type oc-ni-types:sr-sid-type;
       description
         "The type of entry that is contained within the sub-TLV. The range may
         be represented as either a range of MPLS labels, or numeric segment
@@ -1925,7 +1928,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf link-type {
       type identityref {
-        base "oc-ospf-types:OSPFV2_ROUTER_LINK_TYPE";
+        base "oc-ni-types:OSPFV2_ROUTER_LINK_TYPE";
       }
       description
         "The type of link with which extended attributes are associated";
@@ -1941,7 +1944,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPFV2_EXTENDED_LINK_SUBTLV_TYPE";
+        base "oc-ni-types:OSPFV2_EXTENDED_LINK_SUBTLV_TYPE";
       }
       description
         "The type of the sub-TLV contained within the extended link TLV";
@@ -1954,7 +1957,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPFV2_EXTENDED_PREFIX_SUBTLV_TYPE";
+        base "oc-ni-types:OSPFV2_EXTENDED_PREFIX_SUBTLV_TYPE";
       }
       description
         "The type of sub-TLV as indicated by the Extended Prefix LSA";
@@ -2117,7 +2120,7 @@ submodule openconfig-ospfv2-lsdb {
     leaf type {
       type identityref {
         base
-         "oc-ospf-types:OSPFV2_EXTENDED_PREFIX_SID_LABEL_BINDING_SUBTLV_TYPE";
+         "oc-ni-types:OSPFV2_EXTENDED_PREFIX_SID_LABEL_BINDING_SUBTLV_TYPE";
       }
       description
         "The type of sub-TLV that is being contained within the SID/Label
@@ -2153,7 +2156,7 @@ submodule openconfig-ospfv2-lsdb {
 
     leaf type {
       type identityref {
-        base "oc-ospf-types:OSPFV2_EXTPREFIX_BINDING_ERO_PATH_SEGMENT_TYPE";
+        base "oc-ni-types:OSPFV2_EXTPREFIX_BINDING_ERO_PATH_SEGMENT_TYPE";
       }
       description
         "The type of the segment being specified as part of the ERO";
@@ -2592,5 +2595,33 @@ submodule openconfig-ospfv2-lsdb {
       }
     }
   }
+
+
+  // augment the groupings into ospfv2 model
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:global" {
+    description
+      "OSPFv2 gloabl LSA database";
+    uses ospfv2-global-lsdb-structure;
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:areas/oc-ni:area" {
+    description
+      "OSPFv2 area LSA database";
+    uses ospfv2-area-lsdb-structure;
+  }
+
+  augment "/oc-ni:network-instances/oc-ni:network-instance/" +
+          "oc-ni:protocols/oc-ni:protocol/oc-ni:ospf/" +
+          "oc-ni:areas/oc-ni:area/" +
+          "oc-ni:interfaces/oc-ni:interface" {
+    description
+      "OSPFv2 link LSA database";
+    uses ospfv2-link-lsdb-structure;
+  } 
+
 
 }
